@@ -1,0 +1,135 @@
+import {Element, LineElement, TextElement, ImageElement, BarcodeElement, ElementType} from './model';
+import {drag, mousewheel,moveEvent} from './event'
+
+interface Canvas {
+
+    init();
+
+    draw();
+
+    showModel(arr: Element[],width,height);
+}
+
+class CanvasImpl implements Canvas {
+    mul: number;
+    transX: number;
+    transY: number;
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    data: Element[];
+    width: number;
+    height: number;
+    activationElement:Element|null;
+    private textArr: any[] | undefined;
+
+    constructor( mul = 1,) {
+        this.mul = mul;// 缩放率 默认为1
+        this.transX = 0;
+        this.transY = 0;
+        this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
+        this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
+        this.width = 0;
+        this.height = 0;
+        this.data = []
+        this.init();
+        this.activationElement = null;
+    }
+
+    init() {
+        this.canvas.setAttribute('style', `
+    						background-color:#e6e6e6;
+    						cursor:url(shou.ico),auto;
+                                        `);
+        this.canvas.setAttribute("width", "600");
+        this.canvas.setAttribute("height", "400");
+        this.canvas.onmousedown = (event) => {
+            drag.call(this, event, this);
+        }
+        this.canvas.onmousemove = (event) => {
+            moveEvent.call(this, event,this);
+        }
+        if (this.canvas.addEventListener) {
+            this.canvas.addEventListener('DOMMouseScroll', (event) => {
+                mousewheel.call(this, event, this);
+            }, false);
+            this.canvas.addEventListener('mousewheel', (event) => {
+                mousewheel.call(this, event, this);
+            }, false);
+        }
+
+        this.draw();
+    }
+
+    showModel(arr: Element[],width,height) {
+        this.data = []
+        this.data.push(...arr)
+        this.width = width
+        this.height = height
+        this.draw()
+    }
+
+    draw() {
+        this.ctx.strokeStyle="#000000"
+        this.ctx.lineWidth = 1
+        //this.textArr = [];
+        // @ts-ignore
+        this.ctx.clearRect(0, 0, 600, 400);
+
+        // 画轮廓
+
+        this.ctx.beginPath();
+        this.ctx.setLineDash([5, 4]);
+        this.ctx.moveTo(this.transX, this.transY);
+        this.ctx.lineTo(this.width* this.mul+this.transX, this.transY);
+        this.ctx.lineTo(this.width* this.mul+this.transX, this.height* this.mul+this.transY);
+        this.ctx.lineTo(this.transX, this.height* this.mul+this.transY);
+        this.ctx.closePath();
+        this.ctx.stroke();
+
+        // 画
+        this.ctx.setLineDash([]);
+        for (let ele of this.data) {
+            if (ele.type === 1) {
+                const line = ele as LineElement;
+                this.ctx.beginPath();
+                this.ctx.moveTo(line.startX * this.mul + this.transX, line.startY * this.mul + this.transY);
+                this.ctx.lineTo(line.endX * this.mul + this.transX, line.endY * this.mul + this.transY);
+                this.ctx.closePath();
+                this.ctx.stroke();
+            } else if (ele.type === 2) {
+                const text = ele as TextElement;
+                this.ctx.fillText(text.value, text.startX * this.mul + this.transX, text.startY * this.mul + this.transY);
+            } else if (ele.type === 3 || ele.type === 4) {
+                const img = ele as ImageElement;
+                this.ctx.strokeRect(img.startX * this.mul + this.transX, img.startY * this.mul + this.transY, img.width, img.height)
+            }
+        }
+
+        if(this.activationElement){
+            this.ctx.strokeStyle="#08aa50"
+            this.ctx.lineWidth = 5
+            if (this.activationElement.type === 1) {
+                const line = this.activationElement as LineElement;
+                this.ctx.beginPath();
+                this.ctx.moveTo(line.startX * this.mul + this.transX, line.startY * this.mul + this.transY);
+                this.ctx.lineTo(line.endX * this.mul + this.transX, line.endY * this.mul + this.transY);
+                this.ctx.closePath();
+                this.ctx.stroke();
+            } else if (this.activationElement.type === 2) {
+                const text = this.activationElement as TextElement;
+                this.ctx.fillText(text.value, text.startX * this.mul + this.transX, text.startY * this.mul + this.transY);
+            } else if (this.activationElement.type === 3 || this.activationElement.type === 4) {
+                const img = this.activationElement as ImageElement;
+                this.ctx.strokeRect(img.startX * this.mul + this.transX, img.startY * this.mul + this.transY, img.width, img.height)
+            }
+        }
+
+
+    }
+
+
+}
+
+
+export type {Canvas};
+export {CanvasImpl}
