@@ -42,6 +42,10 @@ class CanvasImpl implements Canvas {
                                         `);
         this.canvas.setAttribute("width", "600");
         this.canvas.setAttribute("height", "400");
+        //屏蔽官方的右键菜单
+        this.canvas.oncontextmenu = function(){
+            return false;
+        }
         this.canvas.onmousedown = (event) => {
             drag.call(this, event, this);
         }
@@ -101,7 +105,7 @@ class CanvasImpl implements Canvas {
                 this.ctx.fillText(text.value, text.startX * this.mul + this.transX, text.startY * this.mul + this.transY);
             } else if (ele.type === 3 || ele.type === 4) {
                 const img = ele as ImageElement;
-                this.ctx.strokeRect(img.startX * this.mul + this.transX, img.startY * this.mul + this.transY, img.width, img.height)
+                this.ctx.strokeRect(img.startX * this.mul + this.transX, img.startY * this.mul + this.transY, img.width* this.mul, img.height* this.mul)
             }
         }
 
@@ -120,7 +124,7 @@ class CanvasImpl implements Canvas {
                 this.ctx.fillText(text.value, text.startX * this.mul + this.transX, text.startY * this.mul + this.transY);
             } else if (this.activationElement.type === 3 || this.activationElement.type === 4) {
                 const img = this.activationElement as ImageElement;
-                this.ctx.strokeRect(img.startX * this.mul + this.transX, img.startY * this.mul + this.transY, img.width, img.height)
+                this.ctx.strokeRect(img.startX * this.mul + this.transX, img.startY * this.mul + this.transY, img.width* this.mul, img.height* this.mul)
             }
         }
 

@@ -3,47 +3,51 @@ import {ImageElement, LineElement, TextElement, Point, Vect} from "./model";
 
 const drag = (event_1, cav: CanvasImpl) => {
     event_1 = window.event || event_1;
-    let lx = event_1.clientX;
-    let ly = event_1.clientY;
-    let la = cav.transX;
-    let lb = cav.transY;
-    cav.canvas.onmousemove = null;
-    let sourceEle = cav.activationElement===null?null:JSON.parse(JSON.stringify(cav.activationElement));
-    cav.canvas.onmousemove = (event_2) => {
-        let fx = event_2.clientX;
-        let fy = event_2.clientY;
-        if(cav.activationElement===null){
-            cav.transX = la - (lx - fx);
-            cav.transY = lb - (ly - fy);
-        }else{
-            if (cav.activationElement.type === 1) {
-                const line = cav.activationElement as LineElement;
-                const sourceLine = sourceEle as LineElement;
-                line.startX = sourceLine.startX - (lx-fx)
-                line.startY = sourceLine.startY - (ly - fy)
-                line.endX = sourceLine.endX - (lx-fx)
-                line.endY = sourceLine.endY - (ly - fy)
-            } else if (cav.activationElement.type === 2) {
-                const text = cav.activationElement as TextElement;
-                text.startX = sourceEle.startX - (lx-fx)
-                text.startY = sourceEle.startY - (ly - fy)
-            } else if (cav.activationElement.type === 3 || cav.activationElement.type === 4) {
-                const text = cav.activationElement as TextElement;
-                text.startX = sourceEle.startX - (lx-fx)
-                text.startY = sourceEle.startY - (ly - fy)
+
+    if(event_1.button===0){
+        let lx = event_1.clientX;
+        let ly = event_1.clientY;
+        let la = cav.transX;
+        let lb = cav.transY;
+        cav.canvas.onmousemove = null;
+        let sourceEle = cav.activationElement===null?null:JSON.parse(JSON.stringify(cav.activationElement));
+        cav.canvas.onmousemove = (event_2) => {
+            let fx = event_2.clientX;
+            let fy = event_2.clientY;
+            if(cav.activationElement===null){
+                cav.transX = la - (lx - fx);
+                cav.transY = lb - (ly - fy);
+            }else{
+                if (cav.activationElement.type === 1) {
+                    const line = cav.activationElement as LineElement;
+                    const sourceLine = sourceEle as LineElement;
+                    line.startX = sourceLine.startX - (lx-fx)
+                    line.startY = sourceLine.startY - (ly - fy)
+                    line.endX = sourceLine.endX - (lx-fx)
+                    line.endY = sourceLine.endY - (ly - fy)
+                } else if (cav.activationElement.type === 2) {
+                    const text = cav.activationElement as TextElement;
+                    text.startX = sourceEle.startX - (lx-fx)
+                    text.startY = sourceEle.startY - (ly - fy)
+                } else if (cav.activationElement.type === 3 || cav.activationElement.type === 4) {
+                    const text = cav.activationElement as TextElement;
+                    text.startX = sourceEle.startX - (lx-fx)
+                    text.startY = sourceEle.startY - (ly - fy)
+                }
+            }
+
+            cav.draw();
+        };
+
+        cav.canvas.onmouseup = () => {
+            cav.canvas.onmousemove = null;
+            cav.canvas.onmouseup = null;
+            cav.canvas.onmousemove = (event) => {
+                moveEvent.call(cav, event, cav);
             }
         }
-
-        cav.draw();
-    };
-
-    cav.canvas.onmouseup = () => {
-        cav.canvas.onmousemove = null;
-        cav.canvas.onmouseup = null;
-        cav.canvas.onmousemove = (event) => {
-            moveEvent.call(cav, event, cav);
-        }
     }
+
 }
 const mousewheel = (event, cav: CanvasImpl) => {
     event = event || window.event;
@@ -82,8 +86,8 @@ const moveEvent = (event_1, cav: CanvasImpl) => {
     event_1 = window.event || event_1;
     let i = event_1.offsetX;
     let j = event_1.offsetY;
-    i = i - cav.transX
-    j = j - cav.transY
+    i = (i - cav.transX)/cav.mul
+    j = (j - cav.transY)/cav.mul
     let isFind = false;
     // 先找图片文字
     cav.data.forEach(ele => {

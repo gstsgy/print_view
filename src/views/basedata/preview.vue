@@ -4,13 +4,13 @@
       <div class="handle-box">
 
 
-        <el-select v-model="model" filterable clearable class="handle-select mr10"
+        <el-select v-model="modelId" filterable clearable class="handle-select mr10"
                    @change="query">
           <el-option
               v-for="item in models"
-              :key="item"
+              :key="item.id"
               :label="item.name"
-              :value="item"
+              :value="item.id"
           />
         </el-select>
       </div>
@@ -37,7 +37,7 @@ const params=ref()
 
 // 定义变量
 const models = ref([] as any[])
-const model = ref()
+const modelId = ref()
 const elements = ref([] as any[]);
 const canvas = ref<CanvasImpl>()
 
@@ -46,11 +46,13 @@ const canvas = ref<CanvasImpl>()
 const query = () => {
   request.get("/model/elements", {
     params: {
-      "modelId": model.value.id
+      "modelId": modelId.value
     }
   }).then(res => {
     elements.value = res.data;
-    canvas.value?.showModel(elements.value,model.value.width,model.value.height)
+    const model = models.value.find(it=>it.id===modelId.value)
+
+    canvas.value?.showModel(elements.value,model.width,model.height)
   })
 };
 

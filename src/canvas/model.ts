@@ -1,3 +1,12 @@
+interface Model{
+    id:number|string;
+    name:string|undefined|null;
+    width:number;
+    height:number;
+    printerName:string;
+    eles?:Element[]|null;
+}
+
 interface Element {
     id: string;
     readonly modelId: string;
