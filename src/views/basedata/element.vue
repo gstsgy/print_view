@@ -4,7 +4,7 @@
       <div class="handle-box">
 
 
-        <el-select v-model="modelId" filterable clearable  class="handle-select mr10"
+        <el-select v-model="modelId" filterable clearable class="handle-select mr10"
                    @change="query">
           <el-option
               v-for="item in models"
@@ -36,7 +36,7 @@
         <el-table-column prop="remark" label="备注"></el-table-column>
       </el-table>
       <el-button type="danger" icon="Delete" @click="del">删除</el-button>
-<!--      <el-button type="primary" icon="Plus" @click="add">新增</el-button>-->
+      <el-button type="primary" icon="Plus" @click="add">新增</el-button>
 
     </div>
 
@@ -45,13 +45,37 @@
     <EditModel ref="textForm" @saveForm="commit" :form="textFormModel"></EditModel>
     <EditModel ref="imgForm" @saveForm="commit" :form="imgFormModel"></EditModel>
 
+<!--    新增-->
+    <el-dialog v-model="centerDialogVisible" title="请选择元素类型" width="30%" center>
+      <el-select v-model="addType" filterable clearable class="handle-select mr10">
+        <el-option
+            v-for="item in types"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+        />
+      </el-select>
+      <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="centerDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="addShowForm">
+          确认
+        </el-button>
+      </span>
+      </template>
+    </el-dialog>
   </div>
+
+
+
+
+
 </template>
 
 <script setup lang="ts" name="warehouse">
 import request from '../../utils/request';
 import {ref, reactive} from 'vue';
-import {ElMessage,ElTable} from 'element-plus';
+import {ElMessage, ElTable} from 'element-plus';
 import EditModel from '../../components/EditModel.vue'
 import {FormField, FormType} from "../../api/interface";
 
@@ -65,134 +89,141 @@ const editVisible = ref(false);
 const lineForm = ref<InstanceType<typeof EditModel>>()
 const textForm = ref<InstanceType<typeof EditModel>>()
 const imgForm = ref<InstanceType<typeof EditModel>>()
-const baseModel =[
+const baseModel = [
   {
     type: FormType.input,
     label: "编号",
-    vmodel: "id" ,
+    vmodel: "id",
     option: null,
-    readonly:false
+    readonly: false
   },
   {
     type: FormType.input,
     label: "名称",
-    vmodel: "name" ,
+    vmodel: "name",
     option: null,
-    readonly:false
+    readonly: false
   },
   {
     type: FormType.input,
     label: "模型id",
-    vmodel: "modelId" ,
+    vmodel: "modelId",
     option: null,
-    readonly:true
+    readonly: true
   },
   {
     type: FormType.inputNumber,
     label: "起始x",
-    vmodel: "startX" ,
+    vmodel: "startX",
     option: null,
-    readonly:false
+    readonly: false
   },
   {
     type: FormType.inputNumber,
     label: "起始y",
-    vmodel: "startY" ,
+    vmodel: "startY",
     option: null,
-    readonly:false
+    readonly: false
   },
   {
     type: FormType.select,
     label: "类型",
-    vmodel: "type" ,
-    option:  [
+    vmodel: "type",
+    option: [
       {
         value: 1,
         label: "线段"
       }, {
         value: 2,
         label: "文本"
-      },{
+      }, {
         value: 3,
         label: "图片"
-      },{
+      }, {
         value: 4,
         label: "条码"
       }
     ],
-    readonly:true
+    readonly: true
   },
 ]
-const lineFormModel=reactive<Array<FormField>>([
+const lineFormModel = reactive<Array<FormField>>([
   ...baseModel,
   {
     type: FormType.inputNumber,
     label: "结束x",
-    vmodel: "endX" ,
+    vmodel: "endX",
     option: null,
-    readonly:false
+    readonly: false
   },
   {
     type: FormType.inputNumber,
     label: "结束y",
-    vmodel: "endY" ,
+    vmodel: "endY",
     option: null,
-    readonly:false
+    readonly: false
   }
 ]);
-const textFormModel=reactive<Array<FormField>>([
+const textFormModel = reactive<Array<FormField>>([
   ...baseModel,
   {
     type: FormType.input,
     label: "值",
-    vmodel: "value" ,
+    vmodel: "value",
     option: null,
-    readonly:false
+    readonly: false
   },
   {
     type: FormType.input,
     label: "字体",
-    vmodel: "fontName" ,
+    vmodel: "fontName",
     option: null,
-    readonly:false
+    readonly: false
   },
   {
     type: FormType.inputNumber,
     label: "字体格式",
-    vmodel: "fontStyle" ,
+    vmodel: "fontStyle",
     option: null,
-    readonly:false
+    readonly: false
   },
   {
     type: FormType.inputNumber,
     label: "字体大小",
-    vmodel: "size" ,
+    vmodel: "size",
     option: null,
-    readonly:false
+    readonly: false
   }
 ]);
-const imgFormModel=reactive<Array<FormField>>([
+const imgFormModel = reactive<Array<FormField>>([
   ...baseModel,
   {
     type: FormType.input,
     label: "路径",
-    vmodel: "path" ,
+    vmodel: "path",
     option: null,
-    readonly:false
+    readonly: false
+  },
+  {
+    type: FormType.input,
+    label: "value",
+    vmodel: "value",
+    option: null,
+    readonly: false
   },
   {
     type: FormType.inputNumber,
     label: "宽度",
-    vmodel: "width" ,
+    vmodel: "width",
     option: null,
-    readonly:false
+    readonly: false
   },
   {
     type: FormType.inputNumber,
     label: "高度",
-    vmodel: "height" ,
+    vmodel: "height",
     option: null,
-    readonly:false
+    readonly: false
   }
 ]);
 const multipleTable = ref<InstanceType<typeof ElTable>>()
@@ -202,98 +233,142 @@ const multipleTable = ref<InstanceType<typeof ElTable>>()
 const query = () => {
   request.get("/model/elements", {
     params: {
-      "modelId":modelId.value
+      "modelId": modelId.value
     }
   }).then(res => {
     elements.value = res.data;
   })
 };
 const init = () => {
-  request.get("/model/models", ).then(res => {
+  request.get("/model/models",).then(res => {
     models.value = res.data
   })
 }
 
 const indexMethod = (index: number) => {
-  return  index + 1
+  return index + 1
 }
-const showType=(row,column,cellValue,index)=>{
-  if(cellValue===1){
+const showType = (row, column, cellValue, index) => {
+  if (cellValue === 1) {
     return "线段";
-  }
-  else if(cellValue===2){
+  } else if (cellValue === 2) {
     return "文本";
-  }
-  else if(cellValue===3){
+  } else if (cellValue === 3) {
     return "图片";
-  }else if(cellValue===4){
+  } else if (cellValue === 4) {
     return "条码";
   }
 }
 // 分页导航
-const update = (row:any, column:any) => {
-  if(row.type===1){
+const update = (row: any, column: any) => {
+  if (row.type === 1) {
     lineForm.value!.editVisible = true
     lineForm.value!.title = "更新"
     lineForm.value!.data = row
-  }else if(row.type===2){
+  } else if (row.type === 2) {
     textForm.value!.editVisible = true
     textForm.value!.title = "更新"
     textForm.value!.data = row
-  }else if(row.type===3){
+  } else if (row.type === 3 || row.type===4) {
     imgForm.value!.editVisible = true
     imgForm.value!.title = "更新"
     imgForm.value!.data = row
   }
 
 }
-// const add = () => {
-//   form.value!.editVisible = true
-//   form.value!.title = "新增"
-//   form.value!.data = {}
-// }
 init();
 
-const del=()=>{
-  if(multipleTable.value!.getSelectionRows().length===0){
+const del = () => {
+  if (multipleTable.value!.getSelectionRows().length === 0) {
     ElMessage.warning("请勾选要删除的数据");
     return
   }
-  request.delete("ware/wareinfo",{
-    data:multipleTable.value!.getSelectionRows()
-  }).then(res=>{
-    if(res.data){
+  request.delete("model/elements", {
+    data: multipleTable.value!.getSelectionRows()
+  }).then(res => {
+    if (res.data) {
       ElMessage.success("删除成功");
       query();
     }
   })
 }
-const commit = (data: { value: any; })=>{
+const commit = (data: { value: any; }) => {
+  let url = "barcode";
   let form = lineForm;
-  if(data.value.type===1){
+  if (data.value.type === 1) {
+    url = "line";
     form = lineForm
-  }else if(data.value.type===2){
+  } else if (data.value.type === 2) {
+    url = "text";
     form = textForm
-  }else if(data.value.type===3){
+  } else if (data.value.type === 3) {
+    url = "img";
+    form = imgForm
+  } else if (data.value.type === 4) {
     form = imgForm
   }
-  if(form.value!.title==='更新'){
-    request.put("ware/wareinfo",data.value).then(res=>{
-      if(res.data){
+  if (form.value!.title === '更新') {
+    request.put(`model/${url}`, data.value).then(res => {
+      if (res.data) {
         ElMessage.success("更新成功");
         form.value!.editVisible = false;
         query();
       }
     })
   }
-  if(form.value!.title==='新增'){
-    request.post("ware/wareinfo",data.value).then(res=>{
-      if(res.data){
+  if (form.value!.title === '新增') {
+    request.post(`model/${url}`, data.value).then(res => {
+      if (res.data) {
         ElMessage.success("新增成功");
         form.value!.editVisible = false;
         query();
       }
     })
+  }
+}
+// 新增相关
+const addType = ref()
+const types = [
+  {
+    value: '1',
+    label: '线段',
+  },
+  {
+    value: '2',
+    label: '文本',
+  },
+  {
+    value: '3',
+    label: '图片',
+  },
+  {
+    value: '4',
+    label: '条码',
+  }
+]
+const centerDialogVisible = ref()
+const add=()=>{
+  centerDialogVisible.value = true
+}
+const addShowForm = ()=>{
+  if(!addType.value){
+    ElMessage.error("请选择类型");
+    return
+  }
+  centerDialogVisible.value = false
+  console.log(addType.value)
+  if (addType.value == 1) {
+    lineForm.value!.editVisible = true
+    lineForm.value!.title = "新增"
+    lineForm.value!.data = {}
+  } else if (addType.value == 2) {
+    textForm.value!.editVisible = true
+    textForm.value!.title = "新增"
+    textForm.value!.data = {}
+  } else if (addType.value == 3 || addType.value==4) {
+    imgForm.value!.editVisible = true
+    imgForm.value!.title = "新增"
+    imgForm.value!.data = {}
   }
 }
 </script>
