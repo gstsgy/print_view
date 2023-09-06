@@ -30,7 +30,7 @@
 
 <script setup lang="ts" name="preview">
 import request from '../../utils/request';
-import {ref, onMounted, reactive} from 'vue';
+import {ref, onMounted} from 'vue';
 import {ElMessage} from 'element-plus';
 import {CanvasImpl} from '../../canvas/canvas';
 const params=ref()

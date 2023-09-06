@@ -104,12 +104,14 @@ class Vect {
     ver:number;
     zor:number;
     nor:number;// 向量模
+    unitFactor:number;// 向量延伸1 所需的系数
     constructor(z1:Point, z2:Point) {
         this.hor = z2.x - z1.x;
         this.ver = z2.y - z1.y;
         this.zor = z2.z - z1.z;
         //向量的模（平面）
         this.nor = Math.sqrt(this.hor * this.hor + this.ver * this.ver);
+        this.unitFactor = Math.sqrt(1/(this.hor*this.hor+this.ver*this.ver+this.zor*this.zor))
     }
     //两个向量的点积
     vdm(v) {
@@ -118,6 +120,16 @@ class Vect {
     //两个向量的叉积
     vcp(v) {
         return this.hor * v.ver - this.ver * v.hor;
+    }
+    // 累计扩大或者缩小向量  multiple 倍数 取 1 或者 -1
+    accumulate(multiple){
+        this.hor += this.hor * this.unitFactor*multiple
+        this.ver += this.ver*this.unitFactor*multiple
+        this.zor += this.zor*this.unitFactor*multiple
+    }
+
+    getEndPoint(start:Point){
+        return new Point(start.x + this.hor, start.y + this.ver);
     }
 }
 export type {Element, LineElement, TextElement, ImageElement, BarcodeElement}

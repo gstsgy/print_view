@@ -1,16 +1,9 @@
 import {Element, LineElement, TextElement, ImageElement, BarcodeElement, ElementType} from './model';
-import {drag, mousewheel,moveEvent} from './event'
+import {drag, mousewheel, moveEvent} from './event'
 
-interface Canvas {
 
-    init();
 
-    draw();
-
-    showModel(arr: Element[],width,height);
-}
-
-class CanvasImpl implements Canvas {
+class CanvasImpl   {
     mul: number;
     transX: number;
     transY: number;
@@ -60,7 +53,6 @@ class CanvasImpl implements Canvas {
                 mousewheel.call(this, event, this);
             }, false);
         }
-
         this.draw();
     }
 
@@ -135,5 +127,4 @@ class CanvasImpl implements Canvas {
 }
 
 
-export type {Canvas};
 export {CanvasImpl}

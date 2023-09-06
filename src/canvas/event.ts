@@ -3,35 +3,41 @@ import {ImageElement, LineElement, TextElement, Point, Vect} from "./model";
 
 const drag = (event_1, cav: CanvasImpl) => {
     event_1 = window.event || event_1;
-
-    if(event_1.button===0){
+    if(event_1.button===2){
+        // 鼠标右键
+        if(cav.activationElement){
+            console.log(cav.activationElement)
+        }
+    }
+    if (event_1.button === 0) {
+        // // 鼠标左键
         let lx = event_1.clientX;
         let ly = event_1.clientY;
         let la = cav.transX;
         let lb = cav.transY;
         cav.canvas.onmousemove = null;
-        let sourceEle = cav.activationElement===null?null:JSON.parse(JSON.stringify(cav.activationElement));
+        let sourceEle = cav.activationElement === null ? null : JSON.parse(JSON.stringify(cav.activationElement));
         cav.canvas.onmousemove = (event_2) => {
             let fx = event_2.clientX;
             let fy = event_2.clientY;
-            if(cav.activationElement===null){
+            if (cav.activationElement === null) {
                 cav.transX = la - (lx - fx);
                 cav.transY = lb - (ly - fy);
-            }else{
+            } else {
                 if (cav.activationElement.type === 1) {
                     const line = cav.activationElement as LineElement;
                     const sourceLine = sourceEle as LineElement;
-                    line.startX = sourceLine.startX - (lx-fx)
+                    line.startX = sourceLine.startX - (lx - fx)
                     line.startY = sourceLine.startY - (ly - fy)
-                    line.endX = sourceLine.endX - (lx-fx)
+                    line.endX = sourceLine.endX - (lx - fx)
                     line.endY = sourceLine.endY - (ly - fy)
                 } else if (cav.activationElement.type === 2) {
                     const text = cav.activationElement as TextElement;
-                    text.startX = sourceEle.startX - (lx-fx)
+                    text.startX = sourceEle.startX - (lx - fx)
                     text.startY = sourceEle.startY - (ly - fy)
                 } else if (cav.activationElement.type === 3 || cav.activationElement.type === 4) {
                     const text = cav.activationElement as TextElement;
-                    text.startX = sourceEle.startX - (lx-fx)
+                    text.startX = sourceEle.startX - (lx - fx)
                     text.startY = sourceEle.startY - (ly - fy)
                 }
             }
@@ -86,8 +92,8 @@ const moveEvent = (event_1, cav: CanvasImpl) => {
     event_1 = window.event || event_1;
     let i = event_1.offsetX;
     let j = event_1.offsetY;
-    i = (i - cav.transX)/cav.mul
-    j = (j - cav.transY)/cav.mul
+    i = (i - cav.transX) / cav.mul
+    j = (j - cav.transY) / cav.mul
     let isFind = false;
     // 先找图片文字
     cav.data.forEach(ele => {
@@ -130,7 +136,7 @@ const moveEvent = (event_1, cav: CanvasImpl) => {
         })
     }
     if (!isFind) {
-        if(cav.activationElement===null){
+        if (cav.activationElement === null) {
             return
         }
         cav.activationElement = null
@@ -139,6 +145,8 @@ const moveEvent = (event_1, cav: CanvasImpl) => {
     cav.draw()
     //console.log(cav.activationElement)
 }
+
+
 //点到线段最近的距离 P 到 A，B的距离
 // A B 为线段两个端点
 // p为点
