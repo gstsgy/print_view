@@ -132,5 +132,5 @@ class Vect {
         return new Point(start.x + this.hor, start.y + this.ver);
     }
 }
-export type {Element, LineElement, TextElement, ImageElement, BarcodeElement}
+export type {Element, LineElement, TextElement, ImageElement, BarcodeElement,Model}
 export {ElementType,Point,Vect}

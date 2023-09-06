@@ -6,7 +6,10 @@ const drag = (event_1, cav: CanvasImpl) => {
     if(event_1.button===2){
         // 鼠标右键
         if(cav.activationElement){
+            // 修改
             console.log(cav.activationElement)
+        }else {
+            // 新增
         }
     }
     if (event_1.button === 0) {
@@ -73,19 +76,6 @@ const mousewheel = (event, cav: CanvasImpl) => {
             return;
         }
     }
-    // if(cav.mul > 0) {
-    //     if(lm > 0) {
-    //         cav.transX = ((cav.transX + li) * lm / cav.mul) - li;
-    //         cav.transY = ((cav.transY + lj) * lm / cav.mul) - lj;
-    //     }
-    // } else {
-    //     let tmpmul = Math.abs(cav.mul - 1);
-    //     if(lm <= 0) {
-    //         let tmp = Math.abs(lm - 1);
-    //         cav.transX = (((cav.transX + li) / tmp) * tmpmul) - li;
-    //         cav.transY = (((cav.transY + lj) / tmp) * tmpmul) - lj;
-    //     }
-    // }
     cav.draw();
 }
 const moveEvent = (event_1, cav: CanvasImpl) => {
@@ -96,7 +86,7 @@ const moveEvent = (event_1, cav: CanvasImpl) => {
     j = (j - cav.transY) / cav.mul
     let isFind = false;
     // 先找图片文字
-    cav.data.forEach(ele => {
+    cav.elements.forEach(ele => {
         if (ele.type === 2) {
             const text = ele as TextElement;
 
@@ -120,7 +110,7 @@ const moveEvent = (event_1, cav: CanvasImpl) => {
     })
     if (!isFind) {
         // 如果没找到再找线段
-        cav.data.forEach(ele => {
+        cav.elements.forEach(ele => {
             if (ele.type === 1) {
                 const line = ele as LineElement;
                 const A = new Point(line.startX, line.startY)
