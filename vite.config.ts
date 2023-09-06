@@ -6,6 +6,9 @@ import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import { resolve } from 'path'
 export default defineConfig({
+	server:{
+		host: '0.0.0.0',
+	},
 	base: './',
 	plugins: [
 		vue(),
