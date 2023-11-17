@@ -9,11 +9,12 @@ class CanvasImpl {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     elements: Element[];
-    model: Model |null;
+    model: Model | null;
     activationElement: Element | null;
+    floatingDiv: HTMLDivElement | null;
     private textArr: any[] | undefined;
 
-    constructor(mul = 1,) {
+    constructor(mul = 1) {
         this.mul = mul;// 缩放率 默认为1
         this.transX = 0;
         this.transY = 0;
@@ -23,6 +24,7 @@ class CanvasImpl {
         this.elements = []
         this.init();
         this.activationElement = null;
+        this.floatingDiv = null;
     }
 
     init() {
@@ -65,8 +67,8 @@ class CanvasImpl {
         //this.textArr = [];
         // @ts-ignore
         this.ctx.clearRect(0, 0, 600, 400);
-        if(!this.model){
-           return
+        if (!this.model) {
+            return
         }
         // 画轮廓
 

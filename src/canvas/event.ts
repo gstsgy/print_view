@@ -1,21 +1,49 @@
 import {CanvasImpl} from "./canvas";
 import {ImageElement, LineElement, TextElement, Point, Vect} from "./model";
+import {createDiv, createImg, createLine, createText} from "./view";
 
 const drag = (event_1, cav: CanvasImpl) => {
+    if (cav.floatingDiv) {
+        document.body.removeChild(cav.floatingDiv);
+        cav.floatingDiv = null;
+    }
+
     event_1 = window.event || event_1;
-    if(event_1.button===2){
+    let lx = event_1.clientX;
+    let ly = event_1.clientY;
+    if (event_1.button === 2) {
         // 鼠标右键
-        if(cav.activationElement){
+        if (cav.activationElement) {
             // 修改
-            console.log(cav.activationElement)
-        }else {
+            cav.floatingDiv = createDiv(lx, ly);
+            if (cav.activationElement.type == 1) {
+                createLine(cav.floatingDiv, cav.activationElement as LineElement)
+            }
+            if (cav.activationElement.type == 2||cav.activationElement.type == 4) {
+                createText(cav.floatingDiv, cav.activationElement as TextElement)
+            }
+            if (cav.activationElement.type == 3) {
+                createImg(cav.floatingDiv, cav.activationElement as ImageElement)
+            }
+            // // 加元素
+            // let para = document.createElement("p");
+            // let node = document.createTextNode("类型" + " : " + "图片");
+            // para.setAttribute('style', `margin: 8px;
+            // 	text-align: left;
+            // 	font-size: 12px;
+            // 	color: grey;
+            // 	font-family: "微软雅黑" 微软雅黑;
+            // 	height: 12px;`);
+            // para.appendChild(node);
+            // cav.floatingDiv.appendChild(para);
+
+        } else {
             // 新增
         }
     }
     if (event_1.button === 0) {
         // // 鼠标左键
-        let lx = event_1.clientX;
-        let ly = event_1.clientY;
+
         let la = cav.transX;
         let lb = cav.transY;
         cav.canvas.onmousemove = null;
